@@ -8,7 +8,7 @@ LIB_GIT = git@github.com:tle-dref/koalib.git
 LIB_DIR = koalib
 LIB_A = $(LIB_DIR)/libft.a
 LDFLAGS = -L$(LIB_DIR) -lft
-CPPFLAGS = -I$(LIB_DIR)/includes -I./inc
+CPPFLAGS = -I$(LIB_DIR)/includes
 
 # Sources
 SRCS_DIR = src
@@ -18,6 +18,8 @@ OBJS = $(SRCS:.c=.o)
 # Rules
 all: $(NAME)
 
+lib: $(LIB_A)
+
 $(NAME): $(OBJS) $(LIB_A)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LDFLAGS)
 
@@ -26,9 +28,13 @@ $(NAME): $(OBJS) $(LIB_A)
 
 $(LIB_A):
 	@if [ ! -d "$(LIB_DIR)" ]; then \
+		echo "Cloning $(LIB_GIT)..."; \
 		git clone $(LIB_GIT) $(LIB_DIR); \
 	fi
-	@$(MAKE) -C $(LIB_DIR)
+	@if [ ! -f "$(LIB_A)" ]; then \
+		echo "Building library..."; \
+		$(MAKE) -C $(LIB_DIR); \
+	fi
 
 clean:
 	rm -f $(OBJS)
