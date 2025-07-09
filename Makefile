@@ -1,13 +1,13 @@
 # Variables
 NAME = ft_ls
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -fPIE
 
 # Lib
 LIB_GIT = git@github.com:tle-dref/koalib.git
 LIB_DIR = koalib
 LIB_A = $(LIB_DIR)/libft.a
-LDFLAGS = -L$(LIB_DIR) -lft
+LDFLAGS = -L$(LIB_DIR) -lft -pie
 CPPFLAGS = -I$(LIB_DIR)/includes
 
 # Sources
@@ -23,7 +23,7 @@ lib: $(LIB_A)
 $(NAME): $(OBJS) $(LIB_A)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LDFLAGS)
 
-%.o: %.c
+%.o: %.c $(LIB_A)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(LIB_A):
@@ -33,7 +33,7 @@ $(LIB_A):
 	fi
 	@if [ ! -f "$(LIB_A)" ]; then \
 		echo "Building library..."; \
-		$(MAKE) -C $(LIB_DIR); \
+		$(MAKE) -C $(LIB_DIR) CFLAGS="-Wall -Wextra -Werror -fPIC -g -I includes"; \
 	fi
 
 clean:
