@@ -1,7 +1,7 @@
 # Variables
 NAME = ft_ls
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -fPIE
+CFLAGS = -Wall -Wextra -Werror -fPIE -g
 
 # Lib
 LIB_GIT = git@github.com:tle-dref/koalib.git

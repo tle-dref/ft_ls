@@ -30,11 +30,27 @@ typedef struct s_flag_map {
     bool *field;
 } t_flag_map;
 
+typedef struct s_long_flag_map {
+    char *str;
+    bool *field;
+} t_long_flag_map;
+
+typedef struct s_colors {
+    char *directory;
+    char *executable;
+    char *regular;
+    char *symlink;
+    char *pipe;
+    char *socket;
+    char *block_device;
+    char *char_device;
+} t_colors;
+
 typedef struct s_ls{
     char *dir;
     t_flags *flags;
+    t_colors *colors;
 }t_ls;
-// last sort flag is the one done, r is not undoable if he's here he stays
 
 
 #define MUTEX_FLAGS(flag1, flag2, current, flags) \
@@ -44,3 +60,6 @@ typedef struct s_ls{
     } while(0)
 
 t_ls *parsing(char **args);
+t_colors *parse_colors();
+t_colors *get_default_colors();
+void free_colors(t_colors *colors);
