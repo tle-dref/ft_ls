@@ -1,10 +1,15 @@
 #pragma once
  
-
+# include <sys/stat.h>
 # include "libft.h"
 # include <stdbool.h>
 
-
+typedef struct s_listls {
+    char *name;
+    char *path;           // full path of the file or directory
+    struct stat stat;           // name of the file or directory
+    struct s_listls *next; // pointer to the next element in the list
+} t_listls;
 
 // typedef struct s_flags{
     //     bool l; // use a long listing format | print
@@ -36,4 +41,3 @@ typedef struct s_ls{
 }t_ls;
 // last sort flag is the one done, r is not undoable if he's here he stays
 
-t_ls *parsing(char **args);
