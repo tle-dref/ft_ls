@@ -13,7 +13,7 @@ void check_l_flag(char *flag, t_flags *flags)
             return;
         }
     }
-    ft_printf_e("error: unexpected argument '--%s' found", flag);
+    ft_printf_e("error: unexpected argument '--%s' found\n", flag);
     exit(1);
 }
 
@@ -33,7 +33,7 @@ void check_flag(char flag, t_flags *flags)
             return;
         }
     }
-    ft_printf_e("error: unexpected argument '-%c' found", flag);
+    ft_printf_e("error: unexpected argument '-%c' found\n", flag);
     exit(1);
 }
 

@@ -7,7 +7,8 @@
 
 typedef struct s_listls {
     char *name;
-    char *path;           // full path of the file or directory
+    char *path;
+    bool   isdir;                  // full path of the file or directory
     struct stat stat;           // name of the file or directory
     struct s_listls *next; // pointer to the next element in the list
 } t_listls;

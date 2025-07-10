@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
-#include "../inc/ft_ls.h"
+#include "ft_ls.h"
 
-void printtamere(char *name, t_listls **head)
+void printtamere(char *name, t_listls **head, t_ls *ls)
 {
     struct dirent *d;
     DIR *dir = opendir(name);
-    
     if (dir == NULL) {
         ft_printf("Erreur: Impossible d'ouvrir le répertoire %s\n", name);
         return;
@@ -18,47 +18,75 @@ void printtamere(char *name, t_listls **head)
     
     while ((d = readdir(dir)) != NULL)
     {
-        if (ft_strcmp(d->d_name, ".") == 0 || ft_strcmp(d->d_name, "..") == 0 || ft_strcmp(d->d_name, ".git") == 0)
+        // Ignorer . et .. pour éviter la récursion infinie
+        if (ft_strcmp(d->d_name, ".") == 0 || ft_strcmp(d->d_name, "..") == 0)
             continue;
             
+        // Ignorer les fichiers cachés si -a n'est pas activé
+        if (d->d_name[0] == '.' && !ls->flags->a)
+            continue;
+            
+        // Construire le chemin complet
         char *str = ft_strjoin(name, "/");
-        char *tho = ft_strdup(d->d_name);
         char *full_path = clean_join(str, d->d_name);
-
+        
+        // Créer un nouveau nœud
         t_listls *new_node = malloc(sizeof(t_listls));
-        
-        if (ft_strncmp(tho, ".", 1) != 0) {
-            new_node->name = ft_strdup(tho);
-            new_node->path = ft_strdup(full_path);        
+        if (!new_node) {
+            free(str);
+            free(full_path);
+            continue;
         }
         
+        new_node->name = ft_strdup(d->d_name);
+        new_node->path = ft_strdup(full_path);
         if (!new_node->name || !new_node->path) {
-            
+            free(new_node->name);
+            free(new_node->path);
+            free(new_node);
+            free(str);
+            free(full_path);
             continue;
         }
         
+        // Obtenir les informations du fichier
         new_node->stat = (struct stat){0};
-        if (tho && full_path && stat(full_path, &new_node->stat) != 0) {
+        if (stat(full_path, &new_node->stat) != 0) {
+            free(new_node->name);
+            free(new_node->path);
+            free(new_node);
+            free(str);
+            free(full_path);
             continue;
+        }
+        if (S_ISDIR(new_node->stat.st_mode))
+        {
+            new_node->isdir = true;
+        }
+        else
+        {
+            new_node->isdir = false;
         }
         
         // Ajouter en tête de liste
         new_node->next = *head;
         *head = new_node;
         
-        if (S_ISDIR(new_node->stat.st_mode) && false) // rajouter la verif -R
-        {
-            printtamere(full_path, head);
+        // Récursion sur les répertoires si -R est activé
+        if (S_ISDIR(new_node->stat.st_mode) && ls->flags->R) {
+            printtamere(full_path, head, ls);
         }
         
         // Libérer les ressources temporaires
-        free(tho);
+        // free(str);
         free(full_path);
     }
+    
     closedir(dir);
 }
 
-t_listls* reverselist(t_listls *list){
+t_listls* reverselist(t_listls *list)
+{
     t_listls *prev = NULL;
     t_listls *current = list;
     t_listls *next = NULL;
@@ -87,7 +115,7 @@ t_listls* sortbytime(t_listls *list)
         
         while (current && current->next)
         {
-            if (current->stat.st_atime < current->next->stat.st_atime)
+            if (current->stat.st_mtime < current->next->stat.st_mtime)
             {
 
                 next = current->next;
@@ -113,16 +141,72 @@ t_listls* sortbytime(t_listls *list)
     return list;
 }
 
-void printlist(t_listls *list)
+void printlist(t_listls *list, t_ls *ls)
 {
-    // -g retire mochamsa
-    while (list != NULL)
+    t_listls *curr;
+
+    // 1) Affichage des noms dans le répertoire courant
+    if (!ls->flags->R)
     {
-        printf("%s | %s | %ld | %ld\n", list->name, list->path, 
-                list->stat.st_size, list->stat.st_atime);
-        list = list->next;
+        curr = list;
+    
+        while (curr)
+        {
+            ft_printf("%s", curr->name);
+            if (curr->next)
+                ft_printf(" ");
+            curr = curr->next;
+        }
+        ft_printf("\n");
+    }
+    // 2) Descente récursive dans les sous-dossiers si -R
+            
+
+    if (ls->flags->R)
+    {
+        // if (ls->flags->r) 
+        // {
+        //     curr = reverselist(list);
+        //     ft_printf("\n.:\n");
+        //     t_listls *sublist2 = NULL;
+        //     ls ->flags->R = false;
+        //     printtamere(".", &sublist2, ls);
+        //     if (sublist2)
+        //     {
+        //         printlist(sublist2, ls);
+        //     }
+        // }
+        while (curr != NULL)
+        {
+            if (S_ISDIR(curr->stat.st_mode))
+            {
+                ft_printf("\n%s:\n", curr->path);
+
+                t_listls *sublist = NULL;
+                ls->flags->R = false;
+                printtamere(curr->path, &sublist, ls);
+                if (sublist)
+                {
+                    printlist(sublist, ls);
+                }
+            }
+            curr = curr->next;
+        }
+        // if (!ls->flags->r) 
+        // {
+        //     curr = reverselist(list);
+        //     ft_printf("\n.:\n");
+        //     t_listls *sublist2 = NULL;
+        //     ls ->flags->R = false;
+        //     printtamere(".", &sublist2, ls);
+        //     if (sublist2)
+        //     {
+        //         printlist(sublist2, ls);
+        //     }
+        // }
     }
 }
+
 
 void free_list(t_listls *list)
 {
@@ -131,8 +215,10 @@ void free_list(t_listls *list)
     {
         tmp = list;
         list = list->next;
-        free(tmp->name);
-        free(tmp->path);
+        if (tmp->name)
+            free(tmp->name);
+        if (tmp->path)
+            free(tmp->path);
         free(tmp);
     }
 }
@@ -140,100 +226,35 @@ void free_list(t_listls *list)
 int main(int ac, char **argv)
 {
     (void)ac;
-    (void)argv;
     
     t_listls *file_list = NULL;
     
-    // Parcourir le répertoire et créer la liste
-    printtamere(".", &file_list);
+    t_ls *ls = parsing(argv);
+    if(!ls)
+    {
+        return 1;
+    }
     
-    ft_printf("=== Liste des fichiers ===\n");
-    printlist(file_list);
-    // Inverser la liste
-    file_list = reverselist(file_list);
-    printf("\n");
-    printlist(file_list);
-    // Trier par date d'accès
-    file_list = sortbytime(file_list);
-    printf("\n");
-    printlist(file_list);
+    // Parcourir le répertoire et créer la liste
+    printtamere(ls->dir, &file_list, ls);
+    
+    if (ls->flags->t)
+    {
+        // Trier par date de modification
+        file_list = sortbytime(file_list);
+    }
+    if (ls->flags->r)
+    {
+        // Inverser la liste
+        file_list = reverselist(file_list);
+    }
+    
+    printlist(file_list, ls);
+    
     // Libérer la mémoire
     free_list(file_list);
+    free(ls->flags);
+    free(ls);
+    
+    return 0;
 }
-// #include "ft_ls.h"
-
-// void print_flags(t_flags *flags)
-// {
-//     ft_printf("Flags active:\n");
-//     if (flags->l) ft_printf("  -l: long format\n");
-//     if (flags->a) ft_printf("  -a: show hidden files\n");
-//     if (flags->Z) ft_printf("  -Z: security context\n");
-//     if (flags->f) ft_printf("  -f: brut format\n");
-//     if (flags->g) ft_printf("  -g: long format without owner\n");
-//     if (flags->F) ft_printf("  -F: classify files\n");
-//     if (flags->t) ft_printf("  -t: sort by time\n");
-//     if (flags->r) ft_printf("  -r: reverse order\n");
-//     if (flags->U) ft_printf("  -U: no sorting\n");
-//     if (flags->R) ft_printf("  -R: recursive\n");
-//     if (flags->d) ft_printf("  -d: directory itself\n");
-//     if (flags->colors) ft_printf(" --colors\n");
-// }
-
-// void test_colors(t_colors *colors)
-// {
-//     if (!colors) {
-//         ft_printf("No colors configuration found.\n");
-//         return;
-//     }
-    
-//     ft_printf("\n=== COLORS TEST ===\n");
-//     ft_printf("Testing color codes:\n");
-    
-//     if (colors->directory)
-//         ft_printf("Directory: \033[%sm[DIR]\033[0m (%s)\n", colors->directory, colors->directory);
-//     if (colors->executable)
-//         ft_printf("Executable: \033[%sm[EXE]\033[0m (%s)\n", colors->executable, colors->executable);
-//     if (colors->symlink)
-//         ft_printf("Symlink: \033[%sm[LINK]\033[0m (%s)\n", colors->symlink, colors->symlink);
-//     if (colors->pipe)
-//         ft_printf("Pipe: \033[%sm[PIPE]\033[0m (%s)\n", colors->pipe, colors->pipe);
-//     if (colors->socket)
-//         ft_printf("Socket: \033[%sm[SOCK]\033[0m (%s)\n", colors->socket, colors->socket);
-//     if (colors->block_device)
-//         ft_printf("Block device: \033[%sm[BLK]\033[0m (%s)\n", colors->block_device, colors->block_device);
-//     if (colors->char_device)
-//         ft_printf("Char device: \033[%sm[CHR]\033[0m (%s)\n", colors->char_device, colors->char_device);
-//     if (colors->regular)
-//         ft_printf("Regular file: \033[%sm[REG]\033[0m (%s)\n", colors->regular, colors->regular);
-// }
-
-// int main(int ac, char **av)
-// {
-    
-//     for (int i = 0; i < ac; i++) {
-//         ft_printf("arg[%d]: %s\n", i, av[i]);
-//     }
-    
-//     t_ls *ls = parsing(av);
-//     if (!ls)
-//         return 1;
-    
-//     ft_printf("\n=== PARSING RESULTS ===\n");
-//     print_flags(ls->flags);
-    
-//     if (ls->flags->colors && ls->colors) {
-//         test_colors(ls->colors);
-//     }
-    
-//     if (ls->dir) {
-//         ft_printf("Directory: %s\n", ls->dir);
-//     } else {
-//         ft_printf("Directory: current directory (.)\n");
-//     }
-    
-//     free(ls->flags);
-//     if (ls->colors)
-//         free_colors(ls->colors);
-//     free(ls);
-//     return 0;
-// }
