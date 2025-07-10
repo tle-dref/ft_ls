@@ -3,7 +3,7 @@
 
 # include "libft.h"
 # include <stdbool.h>
-
+# include <dirent.h>
 
 
 // typedef struct s_flags{
@@ -35,5 +35,12 @@ typedef struct s_ls{
     t_flags *flags;
 }t_ls;
 // last sort flag is the one done, r is not undoable if he's here he stays
+
+
+#define MUTEX_FLAGS(flag1, flag2, current, flags) \
+    do { \
+        if (current == flag1) flags->t = false; \
+        else if (current == flag2) flags->U = false; \
+    } while(0)
 
 t_ls *parsing(char **args);

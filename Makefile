@@ -8,7 +8,7 @@ LIB_GIT = git@github.com:tle-dref/koalib.git
 LIB_DIR = koalib
 LIB_A = $(LIB_DIR)/libft.a
 LDFLAGS = -L$(LIB_DIR) -lft -pie
-CPPFLAGS = -I$(LIB_DIR)/includes
+CPPFLAGS = -I$(LIB_DIR)/includes -Iinc
 
 # Sources
 SRCS_DIR = src
