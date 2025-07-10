@@ -3,6 +3,7 @@
 # include <sys/stat.h>
 # include "libft.h"
 # include <stdbool.h>
+# include <dirent.h>
 
 typedef struct s_listls {
     char *name;
@@ -10,6 +11,7 @@ typedef struct s_listls {
     struct stat stat;           // name of the file or directory
     struct s_listls *next; // pointer to the next element in the list
 } t_listls;
+
 
 // typedef struct s_flags{
     //     bool l; // use a long listing format | print
@@ -41,3 +43,11 @@ typedef struct s_ls{
 }t_ls;
 // last sort flag is the one done, r is not undoable if he's here he stays
 
+
+#define MUTEX_FLAGS(flag1, flag2, current, flags) \
+    do { \
+        if (current == flag1) flags->t = false; \
+        else if (current == flag2) flags->U = false; \
+    } while(0)
+
+t_ls *parsing(char **args);
