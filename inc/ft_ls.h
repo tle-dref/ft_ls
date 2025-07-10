@@ -71,3 +71,11 @@ t_ls *parsing(char **args);
 t_colors *parse_colors();
 t_colors *get_default_colors();
 void free_colors(t_colors *colors);
+int	ft_strcasecmp(const char *s1, const char *s2);
+
+
+//sort
+t_listls *sort_alphabet(t_listls *list);
+t_listls* reverselist(t_listls *list);
+t_listls* sortbytime(t_listls *list);
+
