@@ -144,11 +144,11 @@ t_listls* sortbytime(t_listls *list)
 void printlist(t_listls *list, t_ls *ls)
 {
     t_listls *curr;
+    curr = list;
 
     // 1) Affichage des noms dans le répertoire courant
     if (!ls->flags->R)
     {
-        curr = list;
     
         while (curr)
         {
@@ -164,18 +164,18 @@ void printlist(t_listls *list, t_ls *ls)
 
     if (ls->flags->R)
     {
-        // if (ls->flags->r) 
-        // {
-        //     curr = reverselist(list);
-        //     ft_printf("\n.:\n");
-        //     t_listls *sublist2 = NULL;
-        //     ls ->flags->R = false;
-        //     printtamere(".", &sublist2, ls);
-        //     if (sublist2)
-        //     {
-        //         printlist(sublist2, ls);
-        //     }
-        // }
+        if (ls->flags->r) 
+        {
+            curr = reverselist(list);
+            ft_printf("\n.:\n");
+            t_listls *sublist2 = NULL;
+            ls ->flags->R = false;
+            printtamere(".", &sublist2, ls);
+            if (sublist2)
+            {
+                printlist(sublist2, ls);
+            }
+        }
         while (curr != NULL)
         {
             if (S_ISDIR(curr->stat.st_mode))
@@ -192,18 +192,18 @@ void printlist(t_listls *list, t_ls *ls)
             }
             curr = curr->next;
         }
-        // if (!ls->flags->r) 
-        // {
-        //     curr = reverselist(list);
-        //     ft_printf("\n.:\n");
-        //     t_listls *sublist2 = NULL;
-        //     ls ->flags->R = false;
-        //     printtamere(".", &sublist2, ls);
-        //     if (sublist2)
-        //     {
-        //         printlist(sublist2, ls);
-        //     }
-        // }
+        if (!ls->flags->r) 
+        {
+            curr = reverselist(list);
+            ft_printf("\n.:\n");
+            t_listls *sublist2 = NULL;
+            ls ->flags->R = false;
+            printtamere(".", &sublist2, ls);
+            if (sublist2)
+            {
+                printlist(sublist2, ls);
+            }
+        }
     }
 }
 
