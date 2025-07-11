@@ -5,6 +5,9 @@
 # include <stdbool.h>
 # include <dirent.h>
 #include <sys/ioctl.h>
+#include <grp.h> 
+#include <pwd.h> 
+#include <time.h>
 
 typedef struct s_listls {
     char *name;
@@ -80,4 +83,15 @@ void free_list(t_listls *list);
 t_listls *sort_alphabet(t_listls *list);
 t_listls* reverselist(t_listls *list);
 t_listls* sortbytime(t_listls *list);
+
+//print
+void printlist(t_listls *list, t_ls *ls);
+void print_list_l(t_listls *list, t_ls *ls);
+
+//format
+char *format_time(time_t t);
+char *format_perm(mode_t perms);
+char *format_number_right(int num, int width);
+char *format_string_left(char *str, int width);
+
 

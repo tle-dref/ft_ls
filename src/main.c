@@ -9,6 +9,7 @@
 #include "ft_ls.h"
 
 
+
 void ft_ls(char *name, t_listls **head, t_ls *ls)
 {
     struct dirent *d;
@@ -22,7 +23,7 @@ void ft_ls(char *name, t_listls **head, t_ls *ls)
     
     while ((d = readdir(dir)) != NULL)
     {
-        if (ft_strcmp(d->d_name, ".") == 0 || ft_strcmp(d->d_name, "..") == 0)
+        if (!ls->flags->a && (ft_strcmp(d->d_name, ".") == 0 || ft_strcmp(d->d_name, "..") == 0))
             continue;
             
         if (d->d_name[0] == '.' && !ls->flags->a)
@@ -60,7 +61,7 @@ void ft_ls(char *name, t_listls **head, t_ls *ls)
         }
         
         new_node->stat = (struct stat){0};
-        if (stat(full_path, &new_node->stat) != 0) {
+        if (lstat(full_path, &new_node->stat) != 0) {
             free(new_node->name);
             free(new_node->path);
             free(new_node);
@@ -75,69 +76,6 @@ void ft_ls(char *name, t_listls **head, t_ls *ls)
         free(full_path);
     }
     closedir(dir);
-}
-
-
-void printlist(t_listls *list, t_ls *ls)
-{
-    (void)ls;
-    if (!list)
-        return;
-        
-    int max_len = 0;
-    int count = 0;
-    t_listls *curr = list;
-    
-    while (curr) {
-        int len = ft_strlen(curr->name);
-        if (len > max_len)
-            max_len = len;
-        count++;
-        curr = curr->next;
-    }
-    int term_width = 100;
-    struct winsize w;
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0) {
-        term_width = w.ws_col;
-        // printf("Terminal size: %d columns, %d rows\n", w.ws_col, w.ws_row);
-    } else
-        perror("ioctl");
-
-    int col_width = max_len + 2;
-    int num_cols = term_width / col_width;
-    if (num_cols < 1) num_cols = 1;
-    
-    char **names = malloc(count * sizeof(char*));
-    if (!names) {
-        curr = list;
-        while (curr) {
-            ft_printf("%s\n", curr->name);
-            curr = curr->next;
-        }
-        return;
-    }
-    
-    curr = list;
-    for (int i = 0; i < count; i++) {
-        names[i] = curr->name;
-        curr = curr->next;
-    }
-    
-    int rows = (count + num_cols - 1) / num_cols;
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < num_cols; col++) {
-            int idx = row + col * rows;
-            if (idx < count) {
-                ft_printf("%s", names[idx]);
-                if (col < num_cols - 1 && idx + rows < count) {
-                    ft_printf("  ");
-                }
-            }
-        }
-        ft_printf("\n");
-    }
-    
-    free(names);
 }
 
 
@@ -169,12 +107,12 @@ void ft_ls_recursive(char *dir_name, t_ls *ls)
         t_listls *curr = file_list;
         while (curr) {
             if (curr->isdir) {
-                struct stat link_stat;
-                if (lstat(curr->path, &link_stat) == 0 && !S_ISLNK(link_stat.st_mode)) {
-                    // if (access(curr->path, R_OK) == 0) {
+                if (ft_strcmp(curr->name, ".") != 0 && ft_strcmp(curr->name, "..") != 0) {
+                    struct stat link_stat;
+                    if (lstat(curr->path, &link_stat) == 0 && !S_ISLNK(link_stat.st_mode)) {
                         ft_printf("\n");
                         ft_ls_recursive(curr->path, ls);
-                    // }
+                    }
                 }
             }
             curr = curr->next;
