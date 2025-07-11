@@ -38,3 +38,19 @@ int	ft_strcasecmp(const char *s1, const char *s2)
 	}
 	return ((unsigned char)ft_tolower(*s1) - (unsigned char)ft_tolower(*s2));
 }
+
+
+void free_list(t_listls *list)
+{
+    t_listls *tmp;
+    while (list != NULL)
+    {
+        tmp = list;
+        list = list->next;
+        if (tmp->name)
+            free(tmp->name);
+        if (tmp->path)
+            free(tmp->path);
+        free(tmp);
+    }
+}
