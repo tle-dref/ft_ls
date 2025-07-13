@@ -64,9 +64,11 @@ char *format_number_right(int num, int width)
 {
     char *result = malloc(width + 1);    
     char *num_str = ft_itoa(num);
+    
     int len = ft_strlen(num_str);
     int spaces = width - len;
-    int i, j = 0;
+    int i = 0;
+    int j = 0;
     
     while (i < spaces) {
         result[i] = ' ';
@@ -88,7 +90,8 @@ char *format_string_left(char *str, int width)
     if (!result)
         return NULL;
     
-    int len = ft_strlen(str);    
+    int len = ft_strlen(str);
+    
     int i = 0;
     while (i < len && i < width) {
         result[i] = str[i];
@@ -98,6 +101,7 @@ char *format_string_left(char *str, int width)
         result[i] = ' ';
         i++;
     }
+    
     result[width] = '\0';
     return result;
 }

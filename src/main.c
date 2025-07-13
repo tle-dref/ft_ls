@@ -151,7 +151,8 @@ int main(int ac, char **argv)
         
         free_list(file_list);
     }
-    
+    // char *leak = malloc(1000);
+    // (void)leak;
     // Clean up
     // if (ls->colors)
     //     free_colors(ls->colors);
