@@ -28,6 +28,12 @@ void free_colors(t_colors *colors)
 
 int	ft_strcasecmp(const char *s1, const char *s2)
 {
+    while (*s1 == '.') {
+        s1++;
+    }
+    while (*s2 == '.') {
+        s2++;
+    }
 	while (*s1 && *s2) {
 		char c1 = ft_tolower((unsigned char)*s1);
 		char c2 = ft_tolower((unsigned char)*s2);

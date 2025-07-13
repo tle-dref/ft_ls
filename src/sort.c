@@ -17,7 +17,6 @@ t_listls* sortbytime(t_listls *list)
         {
             if (current->stat.st_mtime < current->next->stat.st_mtime)
             {
-
                 next = current->next;
                 current->next = next->next;
                 next->next = current;
@@ -61,6 +60,7 @@ t_listls* reverselist(t_listls *list)
 t_listls *merge(t_listls *a, t_listls *b) {
     if (!a) return b;
     if (!b) return a;
+
 
     if (ft_strcasecmp(a->name, b->name) <= 0) {
         a->next = merge(a->next, b);

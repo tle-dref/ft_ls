@@ -51,4 +51,70 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+# Test rule
+test: $(NAME)
+	@echo "Testing ft_ls against system ls..."
+	@mkdir -p test_dir/subdir
+	@touch test_dir/file1.txt test_dir/file2.c test_dir/.hidden test_dir/subdir/nested.txt
+	@chmod 755 test_dir/file1.txt
+	@chmod 644 test_dir/file2.c
+	@echo "=== Test 1: Basic listing ==="
+	@echo "System ls:"
+	@ls test_dir
+	@echo "Our ft_ls:"
+	@./ft_ls test_dir
+	@echo
+	@echo "=== Test 2: Long format (-l) ==="
+	@echo "System ls -l:"
+	@ls -l test_dir
+	@echo "Our ft_ls -l:"
+	@./ft_ls -l test_dir
+	@echo
+	@echo "=== Test 3: Show hidden files (-a) ==="
+	@echo "System ls -a:"
+	@ls -a test_dir
+	@echo "Our ft_ls -a:"
+	@./ft_ls -a test_dir
+	@echo
+	@echo "=== Test 4: Reverse order (-r) ==="
+	@echo "System ls -r:"
+	@ls -r test_dir
+	@echo "Our ft_ls -r:"
+	@./ft_ls -r test_dir
+	@echo
+	@echo "=== Test 5: Sort by time (-t) ==="
+	@echo "System ls -t:"
+	@ls -t test_dir
+	@echo "Our ft_ls -t:"
+	@./ft_ls -t test_dir
+	@echo
+	@echo "=== Test 6: Combined flags (-la) ==="
+	@echo "System ls -la:"
+	@ls -la test_dir
+	@echo "Our ft_ls -la:"
+	@./ft_ls -la test_dir
+	@echo
+	@echo "=== Test 7: Combined flags (-lrt) ==="
+	@echo "System ls -lrt:"
+	@ls -lrt test_dir
+	@echo "Our ft_ls -lrt:"
+	@./ft_ls -lrt test_dir
+	@echo
+	@echo "=== Test 8: Current directory ==="
+	@echo "System ls:"
+	@ls
+	@echo "Our ft_ls:"
+	@./ft_ls
+	@echo
+	@echo "=== Test 9: Non-existent file ==="
+	@echo "System ls:"
+	@ls non_existent_file 2>&1 || true
+	@echo "Our ft_ls:"
+	@./ft_ls non_existent_file 2>&1 || true
+	@rm -rf test_dir
+	@echo "Tests completed!"
+
+test_clean:
+	@rm -rf test_dir
+
+.PHONY: all clean fclean re test test_clean

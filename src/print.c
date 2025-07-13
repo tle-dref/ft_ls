@@ -9,7 +9,7 @@ void printlist(t_listls *list, t_ls *ls)
     if (!list)
         return;
     
-    if (ls->flags->l) {
+    if (ls->flags->l || ls->flags->g) {
         print_list_l(list, ls);
         return;
     }
@@ -168,7 +168,10 @@ void print_list_l(t_listls *list, t_ls *ls)
         char *user_str = format_string_left(username, max_user_width);
         char *group_str = format_string_left(groupname, max_group_width);
         if (user_str && group_str) {
-            ft_printf("%s %s ", user_str, group_str);
+            if (!ls->flags->g)
+                ft_printf("%s %s ", user_str, group_str);
+            else
+                ft_printf("%s ", group_str);
             free(user_str);
             free(group_str);
         }

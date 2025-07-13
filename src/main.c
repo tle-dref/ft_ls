@@ -70,8 +70,17 @@ void ft_ls(char *name, t_listls **head, t_ls *ls)
         }
         new_node->isdir = S_ISDIR(new_node->stat.st_mode);
         
-        new_node->next = *head;
-        *head = new_node;
+        new_node->next = NULL;
+
+        if (*head == NULL) {
+            *head = new_node;
+        } else {
+            t_listls *curr = *head;
+            while (curr->next != NULL) {
+                curr = curr->next;
+            }
+            curr->next = new_node;
+        }
         
         free(full_path);
     }
@@ -94,8 +103,9 @@ void ft_ls_recursive(char *dir_name, t_ls *ls)
     
     if (ls->flags->t)
         file_list = sortbytime(file_list);
-    else
+    else if (!ls->flags->U)
         file_list = sort_alphabet(file_list);
+
     
     if (ls->flags->r)
         file_list = reverselist(file_list);
@@ -141,7 +151,7 @@ int main(int ac, char **argv)
         
         if (ls->flags->t)
             file_list = sortbytime(file_list);
-        else
+        else if (!ls->flags->U)
             file_list = sort_alphabet(file_list);
         
         if (ls->flags->r)
