@@ -30,7 +30,7 @@ typedef struct s_listls {
     //     bool U; // not sorted | sort order affected                  ✅
     //     bool R; // recursive | calculus                              ✅
     //     bool d; // specify a directory | calculus                    ✅
-    //     bool colors;
+    //     bool colors;                                                 🤙
     // } t_flags;
 
 typedef struct s_flags {
@@ -101,3 +101,7 @@ char *format_number_right(int num, int width);
 char *format_string_left(char *str, int width);
 
 char *add_extra_link(char *path);
+
+// Color printing functions
+int ft_printfcolor(t_listls *file, t_colors *colors, const char *format, ...);
+char *get_color_for_file(t_listls *file, t_colors *colors);

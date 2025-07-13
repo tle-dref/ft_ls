@@ -207,33 +207,6 @@ void print_flags(t_flags *flags)
     if (flags->colors) ft_printf(" --colors\n");
 }
 
-void test_colors(t_colors *colors)
-{
-    if (!colors) {
-        ft_printf("No colors configuration found.\n");
-        return;
-    }
-    
-    ft_printf("\n=== COLORS TEST ===\n");
-    ft_printf("Testing color codes:\n");
-    
-    if (colors->directory)
-        ft_printf("Directory: \033[%sm[DIR]\033[0m (%s)\n", colors->directory, colors->directory);
-    if (colors->executable)
-        ft_printf("Executable: \033[%sm[EXE]\033[0m (%s)\n", colors->executable, colors->executable);
-    if (colors->symlink)
-        ft_printf("Symlink: \033[%sm[LINK]\033[0m (%s)\n", colors->symlink, colors->symlink);
-    if (colors->pipe)
-        ft_printf("Pipe: \033[%sm[PIPE]\033[0m (%s)\n", colors->pipe, colors->pipe);
-    if (colors->socket)
-        ft_printf("Socket: \033[%sm[SOCK]\033[0m (%s)\n", colors->socket, colors->socket);
-    if (colors->block_device)
-        ft_printf("Block device: \033[%sm[BLK]\033[0m (%s)\n", colors->block_device, colors->block_device);
-    if (colors->char_device)
-        ft_printf("Char device: \033[%sm[CHR]\033[0m (%s)\n", colors->char_device, colors->char_device);
-    if (colors->regular)
-        ft_printf("Regular file: \033[%sm[REG]\033[0m (%s)\n", colors->regular, colors->regular);
-}
 void ft_ls_recursive(char *dir_name, t_ls *ls)
 {
     t_listls *file_list = NULL;
@@ -281,16 +254,10 @@ int main(int ac, char **argv)
 {
     (void)ac;
     t_ls *ls = parsing(argv);
-    test_colors(ls->colors);
     if (!ls)
-    {
         return 1;
-    }
-    if (ls->flags->R)
-        printf("LE CACA\n");
-    if (ls->flags->R) {
+    if (ls->flags->R) 
         ft_ls_recursive(ls->dir, ls);
-    }
     else {
         t_listls *file_list = NULL;
         
@@ -308,11 +275,10 @@ int main(int ac, char **argv)
         
         free_list(file_list);
     }
-    // char *leak = malloc(1000);
-    // (void)leak;
-    // Clean up
-    // if (ls->colors)
-    //     free_colors(ls->colors);
+    char *leak = malloc(1000);
+    (void)leak;
+    if (ls->colors)
+        free_colors(ls->colors);
     free(ls->flags);
     free(ls);
     

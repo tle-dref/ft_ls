@@ -37,11 +37,11 @@ void printlist(t_listls *list, t_ls *ls)
     int num_cols = term_width / col_width;
     if (num_cols < 1) num_cols = 1;
     
-    char **names = malloc(count * sizeof(char*));
-    if (!names) {
+    t_listls **files = malloc(count * sizeof(t_listls*));
+    if (!files) {
         curr = list;
         while (curr) {
-            ft_printf("%s\n", curr->name);
+            ft_printfcolor(curr, ls->colors, "%s\n", curr->name);
             curr = curr->next;
         }
         return;
@@ -49,7 +49,7 @@ void printlist(t_listls *list, t_ls *ls)
     
     curr = list;
     for (int i = 0; i < count; i++) {
-        names[i] = curr->name;
+        files[i] = curr;
         curr = curr->next;
     }
     
@@ -58,7 +58,7 @@ void printlist(t_listls *list, t_ls *ls)
         for (int col = 0; col < num_cols; col++) {
             int idx = row + col * rows;
             if (idx < count) {
-                ft_printf("%s", names[idx]);
+                ft_printfcolor(files[idx], ls->colors, "%s", files[idx]->name);
                 if (col < num_cols - 1 && idx + rows < count) {
                     ft_printf("  ");
                 }
@@ -67,7 +67,7 @@ void printlist(t_listls *list, t_ls *ls)
         ft_printf("\n");
     }
     
-    free(names);
+    free(files);
 }
 
 
@@ -187,14 +187,33 @@ void print_list_l(t_listls *list, t_ls *ls)
             ssize_t linklen = readlink(curr->path, linkbuf, sizeof(linkbuf) - 1);
             if (linklen != -1) {
                 linkbuf[linklen] = '\0';
-                char *readedlink = add_extra_link(linkbuf);
-                ft_printf("%s -> %s\n", curr->name, readedlink);
+                char *readedlink;
+                t_listls *link_list = malloc(sizeof(t_listls));
+                link_list->next = NULL;
+                link_list->path = linkbuf;
+                stat(link_list->path, &link_list->stat);
+                if (ls->flags->F)
+                {
+                    readedlink = add_extra_link(linkbuf);
+                    ft_printfcolor(curr, ls->colors, "%s", curr->name);
+                    ft_printf(" -> ");
+                    ft_printfcolor(link_list, ls->colors, "%s\n", readedlink);
+
+                    // ft_printf(" -> %s\n", readedlink);
+                }
+                else
+                {
+                    ft_printfcolor(curr, ls->colors, "%s", curr->name);
+                    ft_printf(" -> ");
+                    ft_printfcolor(link_list, ls->colors, "%s\n", linkbuf);
+                    // ft_printf(" -> %s\n", linkbuf);
+                }
             } 
             else {
-                ft_printf("%s\n", curr->name);
+                ft_printfcolor(curr, ls->colors, "%s\n", curr->name);
             }
         } else {
-            ft_printf("%s\n", curr->name);
+            ft_printfcolor(curr, ls->colors, "%s\n", curr->name);
         }
         
         free(perms);
