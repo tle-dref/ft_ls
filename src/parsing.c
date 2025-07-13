@@ -30,6 +30,12 @@ void check_flag(char flag, t_flags *flags)
         if (flag_table[i].c == flag) {
             MUTEX_FLAGS('U', 't', flag, flags);
             *(flag_table[i].field) = true;
+            if (flags->d) flags->R = false;
+            if (flags->f) {
+                flags->a = true;
+                flags->U = true;
+                flags->colors = false;
+            }
             return;
         }
     }
@@ -89,7 +95,13 @@ char *check_dir(char *dir_name)
 {
     DIR *dir = opendir(dir_name);
     if (!dir)
-        return NULL;
+    {
+        
+        if (errno == ENOTDIR) 
+        {
+            return dir_name;
+        } 
+    }
     closedir(dir);
     return dir_name;
 }

@@ -8,7 +8,7 @@
 #include <grp.h> 
 #include <pwd.h> 
 #include <time.h>
-
+#include <errno.h>
 typedef struct s_listls {
     char *name;
     char *path;
@@ -19,17 +19,17 @@ typedef struct s_listls {
 
 
 // typedef struct s_flags{
-    //     bool l; // use a long listing format | print
-    //     bool a; // hidden files || print
-    //     bool Z; // add security context | print
-    //     bool f; // brut, -aU enabled | print
-    //     bool g; // -l but without the owner | print prioritary on -l
-    //     bool F; // add / to dir, @to link, etc | print
-    //     bool t; // time sort | sort
-    //     bool r; // reverse | sort not order affected
-    //     bool U; // not sorted | sort order affected
-    //     bool R; // recursive | calculus
-    //     bool d; // specify a directory | calculus
+    //     bool l; // use a long listing format | print                 ✅
+    //     bool a; // hidden files || print                             ✅
+    //     bool Z; // add security context | print                      🤙
+    //     bool f; // brut, -aU enabled | print                         🤙
+    //     bool g; // -l but without the owner | print prioritary on -l ✅
+    //     bool F; // add / to dir, @to link, etc | print               🤙
+    //     bool t; // time sort | sort                                  ✅
+    //     bool r; // reverse | sort not order affected                 ✅
+    //     bool U; // not sorted | sort order affected                  ✅
+    //     bool R; // recursive | calculus                              ✅
+    //     bool d; // specify a directory | calculus                    ✅
     //     bool colors;
     // } t_flags;
 
@@ -71,6 +71,12 @@ typedef struct s_ls{
         else if (current == flag2) flags->U = false; \
     } while(0)
 
+#define MUTEX_calcFLAGS(flag1, flag2, current, flags) \
+    do { \
+        if (current == flag1) flags->f = false; \
+        else if (current == flag2) flags->l = false; \
+    } while(0)
+
 t_ls *parsing(char **args);
 t_colors *parse_colors();
 t_colors *get_default_colors();
@@ -94,4 +100,4 @@ char *format_perm(mode_t perms);
 char *format_number_right(int num, int width);
 char *format_string_left(char *str, int width);
 
-
+char *add_extra_link(char *path);

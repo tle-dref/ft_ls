@@ -187,8 +187,10 @@ void print_list_l(t_listls *list, t_ls *ls)
             ssize_t linklen = readlink(curr->path, linkbuf, sizeof(linkbuf) - 1);
             if (linklen != -1) {
                 linkbuf[linklen] = '\0';
-                ft_printf("%s -> %s\n", curr->name, linkbuf);
-            } else {
+                char *readedlink = add_extra_link(linkbuf);
+                ft_printf("%s -> %s\n", curr->name, readedlink);
+            } 
+            else {
                 ft_printf("%s\n", curr->name);
             }
         } else {
