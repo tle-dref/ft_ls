@@ -1,9 +1,6 @@
 #include "ft_ls.h"
 #include <stdarg.h>
 
-/**
- * Retourne le code couleur approprié selon le type de fichier
- */
 char *get_color_for_file(t_listls *file, t_colors *colors)
 {
     if (!file || !colors)
@@ -29,10 +26,6 @@ char *get_color_for_file(t_listls *file, t_colors *colors)
         return colors->regular;
 }
 
-/**
- * Version colorée de ft_printf spécialisée pour l'affichage de noms de fichiers
- * Supporte uniquement les formats %s et %s\n
- */
 int ft_printfcolor(t_listls *file, t_colors *colors, const char *format, ...)
 {
     va_list args;
@@ -45,25 +38,19 @@ int ft_printfcolor(t_listls *file, t_colors *colors, const char *format, ...)
         
     va_start(args, format);
     
-    // On ne gère que les cas simples : "%s" et "%s\n"
     if (ft_strcmp(format, "%s") == 0 || ft_strcmp(format, "%s\n") == 0) {
         str_arg = va_arg(args, char*);
         
-        // Si on a un fichier et des couleurs, on applique la couleur
         if (file && colors && (color_code = get_color_for_file(file, colors))) {
-            // Avec couleur
             if (ft_strcmp(format, "%s\n") == 0) {
                 result = ft_printf("\033[%sm%s\033[0m\n", color_code, str_arg);
             } else {
                 result = ft_printf("\033[%sm%s\033[0m", color_code, str_arg);
             }
         } else {
-            // Sans couleur
             result = ft_printf(format, str_arg);
         }
     } else {
-        // Pour les autres formats, on utilise ft_printf directement
-        // Note: ceci est une limitation, mais évite vsnprintf
         result = ft_printf("ERROR: Unsupported format in ft_printfcolor\n");
     }
     

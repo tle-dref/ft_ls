@@ -9,6 +9,7 @@
 #include <pwd.h> 
 #include <time.h>
 #include <errno.h>
+
 typedef struct s_listls {
     char *name;
     char *path;
@@ -78,7 +79,6 @@ typedef struct s_ls{
     } while(0)
 
 t_ls *parsing(char **args);
-t_colors *parse_colors();
 t_colors *get_default_colors();
 void free_colors(t_colors *colors);
 int	ft_strcasecmp(const char *s1, const char *s2);

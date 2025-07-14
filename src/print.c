@@ -29,7 +29,6 @@ void printlist(t_listls *list, t_ls *ls)
     struct winsize w;
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0) {
         term_width = w.ws_col;
-        // printf("Terminal size: %d columns, %d rows\n", w.ws_col, w.ws_row);
     } else
         perror("ioctl");
 
@@ -198,15 +197,12 @@ void print_list_l(t_listls *list, t_ls *ls)
                     ft_printfcolor(curr, ls->colors, "%s", curr->name);
                     ft_printf(" -> ");
                     ft_printfcolor(link_list, ls->colors, "%s\n", readedlink);
-
-                    // ft_printf(" -> %s\n", readedlink);
                 }
                 else
                 {
                     ft_printfcolor(curr, ls->colors, "%s", curr->name);
                     ft_printf(" -> ");
                     ft_printfcolor(link_list, ls->colors, "%s\n", linkbuf);
-                    // ft_printf(" -> %s\n", linkbuf);
                 }
             } 
             else {

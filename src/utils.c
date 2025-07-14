@@ -1,42 +1,42 @@
 #include "ft_ls.h"
 
-void free_colors(t_colors *colors)
+void	free_colors(t_colors *colors)
 {
-    if (!colors)
-        return;
-        
-    if (colors->directory)
-        free(colors->directory);
-    if (colors->executable)
-        free(colors->executable);
-    if (colors->regular)
-        free(colors->regular);
-    if (colors->symlink)
-        free(colors->symlink);
-    if (colors->pipe)
-        free(colors->pipe);
-    if (colors->socket)
-        free(colors->socket);
-    if (colors->block_device)
-        free(colors->block_device);
-    if (colors->char_device)
-        free(colors->char_device);
-        
-    free(colors);
+	if (!colors)
+		return ;
+	if (colors->directory)
+		free(colors->directory);
+	if (colors->executable)
+		free(colors->executable);
+	if (colors->regular)
+		free(colors->regular);
+	if (colors->symlink)
+		free(colors->symlink);
+	if (colors->pipe)
+		free(colors->pipe);
+	if (colors->socket)
+		free(colors->socket);
+	if (colors->block_device)
+		free(colors->block_device);
+	if (colors->char_device)
+		free(colors->char_device);
+	free(colors);
 }
 
 
 int	ft_strcasecmp(const char *s1, const char *s2)
 {
-    while (*s1 == '.') {
-        s1++;
-    }
-    while (*s2 == '.') {
-        s2++;
-    }
-	while (*s1 && *s2) {
-		char c1 = ft_tolower((unsigned char)*s1);
-		char c2 = ft_tolower((unsigned char)*s2);
+	char	c1;
+	char	c2;
+
+	while (*s1 == '.')
+		s1++;
+	while (*s2 == '.')
+		s2++;
+	while (*s1 && *s2)
+	{
+		c1 = ft_tolower((unsigned char)*s1);
+		c2 = ft_tolower((unsigned char)*s2);
 		if (c1 != c2)
 			return ((unsigned char)c1 - (unsigned char)c2);
 		s1++;
@@ -46,17 +46,18 @@ int	ft_strcasecmp(const char *s1, const char *s2)
 }
 
 
-void free_list(t_listls *list)
+void	free_list(t_listls *list)
 {
-    t_listls *tmp;
-    while (list != NULL)
-    {
-        tmp = list;
-        list = list->next;
-        if (tmp->name)
-            free(tmp->name);
-        if (tmp->path)
-            free(tmp->path);
-        free(tmp);
-    }
+	t_listls	*tmp;
+
+	while (list != NULL)
+	{
+		tmp = list;
+		list = list->next;
+		if (tmp->name)
+			free(tmp->name);
+		if (tmp->path)
+			free(tmp->path);
+		free(tmp);
+	}
 }
