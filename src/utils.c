@@ -61,3 +61,46 @@ void	free_list(t_listls *list)
 		free(tmp);
 	}
 }
+
+char	*add_extra_link(char *path)
+{
+	struct stat	statlink;
+
+	if (stat(path, &statlink) != 0)
+		return (path);
+	if (S_ISDIR(statlink.st_mode))
+		return (ft_strjoin(path, "/"));
+	else if (S_ISFIFO(statlink.st_mode))
+		return (ft_strjoin(path, "|"));
+	else if (S_ISSOCK(statlink.st_mode))
+		return (ft_strjoin(path, "="));
+	else if (statlink.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+		return (ft_strjoin(path, "*"));
+	return (path);
+}
+
+void	add_extra_info(t_listls *list, t_ls *ls)
+{
+	t_listls	*curr;
+
+	if (!list || !ls || !ls->flags->F)
+		return ;
+	curr = list;
+	while (curr)
+	{
+		if (S_ISDIR(curr->stat.st_mode))
+			curr->name = clean_join(curr->name, "/");
+		else if (S_ISLNK(curr->stat.st_mode))
+		{
+			if (!ls->flags->l)
+				curr->name = clean_join(curr->name, "@");
+		}
+		else if (S_ISFIFO(curr->stat.st_mode))
+			curr->name = clean_join(curr->name, "|");
+		else if (S_ISSOCK(curr->stat.st_mode))
+			curr->name = clean_join(curr->name, "=");
+		else if (curr->stat.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+			curr->name = clean_join(curr->name, "*");
+		curr = curr->next;
+	}
+}

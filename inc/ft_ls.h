@@ -100,7 +100,13 @@ char *format_perm(mode_t perms);
 char *format_number_right(int num, int width);
 char *format_string_left(char *str, int width);
 
+//files
+void ft_ls(char *name, t_listls **head, t_ls *ls);
+void ft_ls_recursive(char *dir_name, t_ls *ls);
+
+//utils
 char *add_extra_link(char *path);
+void add_extra_info(t_listls *list, t_ls *ls);
 
 // Color printing functions
 int ft_printfcolor(t_listls *file, t_colors *colors, const char *format, ...);
