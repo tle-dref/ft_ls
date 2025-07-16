@@ -83,23 +83,23 @@ void	add_extra_info(t_listls *list, t_ls *ls)
 {
 	t_listls	*curr;
 
-	if (!list || !ls || !ls->flags->F)
+	if (!list || !ls || (!ls->flags->F && !ls->flags->p))
 		return ;
 	curr = list;
 	while (curr)
 	{
 		if (S_ISDIR(curr->stat.st_mode))
 			curr->name = clean_join(curr->name, "/");
-		else if (S_ISLNK(curr->stat.st_mode))
+		else if (S_ISLNK(curr->stat.st_mode) && (!ls->flags->p))
 		{
 			if (!ls->flags->l)
 				curr->name = clean_join(curr->name, "@");
 		}
-		else if (S_ISFIFO(curr->stat.st_mode))
+		else if (S_ISFIFO(curr->stat.st_mode) && (!ls->flags->p))
 			curr->name = clean_join(curr->name, "|");
-		else if (S_ISSOCK(curr->stat.st_mode))
+		else if (S_ISSOCK(curr->stat.st_mode) && (!ls->flags->p))
 			curr->name = clean_join(curr->name, "=");
-		else if (curr->stat.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+		else if (curr->stat.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH) && (!ls->flags->p))
 			curr->name = clean_join(curr->name, "*");
 		curr = curr->next;
 	}

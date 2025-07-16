@@ -32,7 +32,8 @@ int ft_printfcolor(t_listls *file, t_colors *colors, const char *format, ...)
     int result = 0;
     char *color_code;
     char *str_arg;
-    
+    long arg;
+
     if (!format)
         return 0;
         
@@ -50,7 +51,15 @@ int ft_printfcolor(t_listls *file, t_colors *colors, const char *format, ...)
         } else {
             result = ft_printf(format, str_arg);
         }
-    } else {
+    }
+    else if(ft_strcmp(format, "%d") == 0 || ft_strcmp(format, "%d\n") == 0)
+    {
+        arg = va_arg(args, long);
+        result = ft_printf(format, arg);
+        ft_printf(" ");
+        ft_printfcolor(file, colors, "%s", file->name);
+    }
+    else {
         result = ft_printf("ERROR: Unsupported format in ft_printfcolor\n");
     }
     

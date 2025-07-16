@@ -26,6 +26,7 @@ static void	check_l_flag(char *flag, t_flags *flags)
 static void	apply_flag_logic(char flag, t_flags *flags)
 {
 	MUTEX_FLAGS('U', 't', flag, flags);
+	// MUTEX_calcFLAGS('F', 'p', flag, flags);
 	if (flags->d)
 		flags->R = false;
 	if (flags->f)
@@ -42,7 +43,9 @@ static void	check_flag(char flag, t_flags *flags)
 		{'l', &flags->l}, {'a', &flags->a}, {'Z', &flags->Z},
 		{'f', &flags->f}, {'g', &flags->g}, {'F', &flags->F},
 		{'t', &flags->t}, {'r', &flags->r}, {'U', &flags->U},
-		{'R', &flags->R}, {'d', &flags->d},
+		{'R', &flags->R}, {'d', &flags->d}, {'S', &flags->S},
+		{'s', &flags->s}, {'p', &flags->p}, {'o', &flags->o},
+		{'N', &flags->N},
 	};
 	size_t		n;
 	size_t		i;
@@ -179,6 +182,7 @@ t_ls	*parsing(char **args)
 		return (NULL);
 	}
 	ls->flags = flags;
+	ls->flags->colors = true;
 	parse_arguments(args, ls);
 	if (!ls->dir)
 		ls->dir = ".";

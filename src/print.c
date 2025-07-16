@@ -23,7 +23,14 @@ static void	calculate_list_metrics(t_listls *list, int *max_len, int *count)
 
 static int	get_terminal_width(void)
 {
-	return (80);
+	int term_width = 100;
+    struct winsize w;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0) {
+        term_width = w.ws_col;
+	}
+	else
+        perror("ioctl");
+	return term_width;
 }
 
 static void	print_simple_list(t_listls *list, t_ls *ls)
@@ -73,7 +80,12 @@ static void	print_columnar_format(t_listls **files, int count, int rows, int num
 			idx = row + col * rows;
 			if (idx < count)
 			{
-				ft_printfcolor(files[idx], ls->colors, "%s", files[idx]->name);
+				if (ls->flags->s)
+				{
+					ft_printfcolor(files[idx], ls->colors, "%d", files[idx]->stat.st_blocks/2, files[idx]->name);
+				}
+				else
+					ft_printfcolor(files[idx], ls->colors, "%s", files[idx]->name);
 				if (col < num_cols - 1 && idx + rows < count)
 					ft_printf("  ");
 			}
@@ -96,14 +108,14 @@ void	printlist(t_listls *list, t_ls *ls)
 
 	if (!list)
 		return ;
-	if (ls->flags->l || ls->flags->g)
+	if (ls->flags->l || ls->flags->g || ls->flags->o)
 	{
 		print_list_l(list, ls);
 		return ;
 	}
 	calculate_list_metrics(list, &max_len, &count);
 	term_width = get_terminal_width();
-	col_width = max_len + 2;
+	col_width = max_len + 1;
 	num_cols = term_width / col_width;
 	if (num_cols < 1)
 		num_cols = 1;
@@ -208,17 +220,30 @@ static void	get_user_group_names(t_listls *curr, char *username, char *groupname
 	pwd = getpwuid(curr->stat.st_uid);
 	grp = getgrgid(curr->stat.st_gid);
 	if (pwd && pwd->pw_name)
-		ft_strlcpy(username, pwd->pw_name, 64);
+	ft_strlcpy(username, pwd->pw_name, 64);
 	else
-		ft_strlcpy(username, "unknown", 64);
+	ft_strlcpy(username, "unknown", 64);
 	if (grp && grp->gr_name)
-		ft_strlcpy(groupname, grp->gr_name, 64);
+	ft_strlcpy(groupname, grp->gr_name, 64);
 	else
-		ft_strlcpy(groupname, "unknown", 64);
+	ft_strlcpy(groupname, "unknown", 64);
+}
+int ft_numlen (int num)
+{
+	int len = 0;
+
+	if (num == 0)
+		return 1;
+	while (num > 0)
+	{
+		num /= 10;
+		len++;
+	}
+	return len;
 }
 
 static void	print_file_info(t_listls *curr, t_ls *ls, int max_nlink_width,
-		int max_user_width, int max_group_width, int max_size_width)
+		int max_user_width, int max_group_width, int max_size_width, int max_totalb_width)
 {
 	char	type;
 	char	*perms;
@@ -229,6 +254,7 @@ static void	print_file_info(t_listls *curr, t_ls *ls, int max_nlink_width,
 	char	*user_str;
 	char	*group_str;
 	char	*size_str;
+	int		spaces_to_add;
 
 	type = get_file_type(curr->stat.st_mode);
 	perms = format_perm(curr->stat.st_mode);
@@ -241,7 +267,12 @@ static void	print_file_info(t_listls *curr, t_ls *ls, int max_nlink_width,
 		free(perms);
 		return ;
 	}
-	ft_printf("%c%s ", type, perms);
+	spaces_to_add = max_totalb_width - ft_numlen(curr->stat.st_blocks / 2);
+	while (spaces_to_add-- > 0)
+		ft_printf(" ");
+	ft_printf("%d", curr->stat.st_blocks / 2);
+	ft_printf(" ");
+	ft_printf("%c%s ",type, perms);
 	nlink_str = format_number_right((int)curr->stat.st_nlink, max_nlink_width);
 	if (nlink_str)
 	{
@@ -252,10 +283,12 @@ static void	print_file_info(t_listls *curr, t_ls *ls, int max_nlink_width,
 	group_str = format_string_left(groupname, max_group_width);
 	if (user_str && group_str)
 	{
-		if (!ls->flags->g)
+		if (ls->flags->l && ((!ls->flags->o) && (!ls->flags->g)))
 			ft_printf("%s %s ", user_str, group_str);
-		else
+		else if (!ls->flags->o)
 			ft_printf("%s ", group_str);
+		else if (!ls->flags->g)
+			ft_printf("%s ", user_str);
 		free(user_str);
 		free(group_str);
 	}
@@ -317,6 +350,7 @@ static void	print_filename(t_listls *curr, t_ls *ls)
 		ft_printfcolor(curr, ls->colors, "%s\n", curr->name);
 }
 
+
 void	print_list_l(t_listls *list, t_ls *ls)
 {
 	int			max_nlink_width;
@@ -324,19 +358,22 @@ void	print_list_l(t_listls *list, t_ls *ls)
 	int			max_group_width;
 	int			max_size_width;
 	long		total_blocks;
+	int 		max_totalb_width;
 	t_listls	*curr;
 
 	if (!list)
 		return ;
 	calculate_column_widths(list, &max_nlink_width, &max_user_width,
 		&max_group_width, &max_size_width);
-	total_blocks = calculate_total_blocks(list);
-	ft_printf("total %d\n", (int)(total_blocks / 2));
+	total_blocks = calculate_total_blocks(list) / 2;
+	ft_printf("total %d\n", (int)(total_blocks));
+	max_totalb_width = ft_numlen(total_blocks);
+
 	curr = list;
 	while (curr)
 	{
 		print_file_info(curr, ls, max_nlink_width, max_user_width,
-			max_group_width, max_size_width);
+			max_group_width, max_size_width, max_totalb_width);
 		print_filename(curr, ls);
 		curr = curr->next;
 	}

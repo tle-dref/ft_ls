@@ -37,6 +37,80 @@ t_listls	*sortbytime(t_listls *list)
 	return (list);
 }
 
+t_listls	*sortbysize(t_listls *list)
+{
+	int			swapped;
+	t_listls	*current;
+	t_listls	*prev;
+	t_listls	*next;
+
+	if (!list || !list->next)
+		return (list);
+	do {
+		swapped = 0;
+		current = list;
+		prev = NULL;
+		while (current && current->next)
+		{
+			if (current->stat.st_size < current->next->stat.st_size)
+			{
+				next = current->next;
+				current->next = next->next;
+				next->next = current;
+				if (prev == NULL)
+					list = next;
+				else
+					prev->next = next;
+				prev = next;
+				swapped = 1;
+			}
+			else
+			{
+				prev = current;
+				current = current->next;
+			}
+		}
+	} while (swapped);
+	return (list);
+}
+
+t_listls	*sortbyblock(t_listls *list)
+{
+	int			swapped;
+	t_listls	*current;
+	t_listls	*prev;
+	t_listls	*next;
+
+	if (!list || !list->next)
+		return (list);
+	do {
+		swapped = 0;
+		current = list;
+		prev = NULL;
+		while (current && current->next)
+		{
+			if (current->stat.st_blocks < current->next->stat.st_blocks)
+			{
+				next = current->next;
+				current->next = next->next;
+				next->next = current;
+				if (prev == NULL)
+					list = next;
+				else
+					prev->next = next;
+				prev = next;
+				swapped = 1;
+			}
+			else
+			{
+				prev = current;
+				current = current->next;
+			}
+		}
+	} while (swapped);
+	return (list);
+}
+
 
 t_listls	*reverselist(t_listls *list)
 {

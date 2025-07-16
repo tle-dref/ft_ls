@@ -44,6 +44,17 @@ static void	add_node_to_list(t_listls **head, t_listls *new_node)
 	}
 }
 
+t_listls *foreach_list_trunc_N(t_listls *list, char * (*func)(const char*,  const char*))
+{
+	t_listls *current = list;
+	while (current)
+	{
+		current->name = func(current->name, "\'");
+		current = current->next;
+	}
+	return list;
+}
+
 static char	*build_full_path(const char *dir_name, const char *file_name)
 {
 	char	*str;

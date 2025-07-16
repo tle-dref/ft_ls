@@ -21,8 +21,14 @@ int	main(int ac, char **argv)
 			file_list = sortbytime(file_list);
 		else if (!ls->flags->U)
 			file_list = sort_alphabet(file_list);
+		if (ls->flags->S)
+			file_list = sortbysize(file_list);
+		if (ls->flags->s)
+			// file_list = sortbyblock(file_list);
 		if (ls->flags->r)
 			file_list = reverselist(file_list);
+		if (ls->flags->N)
+			file_list = foreach_list_trunc_N(file_list, ft_strtrim);
 		printlist(file_list, ls);
 		free_list(file_list);
 	}

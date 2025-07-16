@@ -18,26 +18,32 @@ typedef struct s_listls {
     struct s_listls *next; // pointer to the next element in the list
 } t_listls;
 
-
 // typedef struct s_flags{
-    //     bool l; // use a long listing format | print                 ✅
-    //     bool a; // hidden files || print                             ✅
-    //     bool Z; // add security context | print                      🤙
-    //     bool f; // brut, -aU enabled | print                         🤙
-    //     bool g; // -l but without the owner | print prioritary on -l ✅
-    //     bool F; // add / to dir, @to link, etc | print               🤙
-    //     bool t; // time sort | sort                                  ✅
-    //     bool r; // reverse | sort not order affected                 ✅
-    //     bool U; // not sorted | sort order affected                  ✅
-    //     bool R; // recursive | calculus                              ✅
-    //     bool d; // specify a directory | calculus                    ✅
-    //     bool colors;                                                 🤙
-    // } t_flags;
+//     bool l; // use a long listing format | print                 ✅
+//     bool a; // hidden files || print                             ✅
+//     bool Z; // add security context | print                      🤙
+//     bool f; // brut, -aU enabled | print                         🤙
+//     bool g; // -l but without the owner | print prioritary on -l ✅
+//     bool F; // add / to dir, @to link, etc | print               🤙
+//     bool t; // time sort | sort                                  ✅
+//     bool r; // reverse | sort not order affected                 ✅
+//     bool U; // not sorted | sort order affected                  ✅
+//     bool R; // recursive | calculus                              ✅
+//     bool d; // specify a directory | calculus                    ✅
+//     bool colors;                                                 🤙
+//     bool m;
+//     bool N;
+//     bool o;                                                      ✅
+//     bool p;                                                      ✅
+//     bool s;                                                      ✅
+//     bool S;                                                      ✅
+//     bool 🤙;
+// } t_flags;
 
 typedef struct s_flags {
-    bool l, a, Z, f, g, F, t, r, U, R, d, colors;
+    bool l, a, Z, f, g, F, t, r, U, R, d, colors, S, s, p, o, N;
 } t_flags;
-    
+
 typedef struct s_flag_map {
     char c;
     bool *field;
@@ -74,8 +80,8 @@ typedef struct s_ls{
 
 #define MUTEX_calcFLAGS(flag1, flag2, current, flags) \
     do { \
-        if (current == flag1) flags->f = false; \
-        else if (current == flag2) flags->l = false; \
+        if (current == flag1) flags->p = false; \
+        else if (current == flag2) flags->F = false; \
     } while(0)
 
 t_ls *parsing(char **args);
@@ -89,6 +95,8 @@ void free_list(t_listls *list);
 t_listls *sort_alphabet(t_listls *list);
 t_listls* reverselist(t_listls *list);
 t_listls* sortbytime(t_listls *list);
+t_listls *sortbysize(t_listls *list);
+t_listls *sortbyblock(t_listls *list);
 
 //print
 void printlist(t_listls *list, t_ls *ls);
@@ -111,3 +119,5 @@ void add_extra_info(t_listls *list, t_ls *ls);
 // Color printing functions
 int ft_printfcolor(t_listls *file, t_colors *colors, const char *format, ...);
 char *get_color_for_file(t_listls *file, t_colors *colors);
+
+t_listls *foreach_list_trunc_N(t_listls *list, char *(*func)(const char*, const char*));
